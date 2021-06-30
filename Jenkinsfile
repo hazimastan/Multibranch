@@ -1,48 +1,39 @@
-//@Library('shared-library@master') _
-
-library "shared-library@${PipelineBranch}"
-
-def stageData = ['parallel1','parallel2']
-
-def generateStage(stageId) {
-    return {
-        stage("Parallel: ${stageId}") {
-                echo "This is ${stageId}."
-                build job: 'ParallelTest', wait: true, parameters: [string(name: 'stageId', value: stageId)], propagate: false
-        }
-    }
-}
-
-
 pipeline {
     agent any
-    
+    parameters {
+        choice(name: 'VERSION', choices: ['1.1.0', '1.2.0', '1.3.0'], description: '')
+        booleanParam(name: 'executeTests', defaultValue: true, description: '')
+    }
+    environment {
+        TEST_VAR = 'Test content'
+    }
     stages {
-        stage('Checkout') {
+        stage('Stage1') {
+            agent any
             steps {
-                script {
-                    checkOut()
+                echo "Stage 1"
+                echo "${TEST_VAR}"
+                echo "${JOB_URL}"
+            }
+        }
+        stage('Stage2') {
+            agent {
+                label 'Agent1'
+            }
+            steps {
+                echo "Stage 2"
+            }
+        }
+        stage('Test') {
+            when {
+                expression {
+                    params.executeTests
                 }
             }
-        }
-        stage('PrintFile') {
             steps {
-                bat 'more test.txt'
+                echo "Stage Test"
+                echo "print version : ${params.VERSION}"
             }
         }
-        stage('ParallelMain') {
-            steps {
-                script {
-                    parallel stageData.collectEntries { ["${it}" : generateStage(it)] }
-                }
-            }
-        }
-        stage('Final') {
-            steps {
-               echo "Delete Workspace"
-               cleanWs()
-            }
-        }
-        
     }
 }
