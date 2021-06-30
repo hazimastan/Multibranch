@@ -31,3 +31,7 @@ when
 options
 timeout(time: 60, unit: 'SECONDS')
 retry(2)
+
+catchError(stageResult: 'FAILURE') {
+                    bat 'exit 1'
+                }
