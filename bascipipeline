@@ -1,0 +1,33 @@
+pipeline {
+    agent any    
+    stages {
+        stage('Stage1') {
+            steps {
+                script {
+                }
+            }
+        }
+        stage('PrintFile') {
+            steps {
+            }
+        }
+    }
+}
+
+http://localhost:8085/env-vars.html/
+
+pipeline
+agent
+stages
+stage
+steps
+
+script
+
+parameters
+environment
+post
+when
+options
+timeout(time: 60, unit: 'SECONDS')
+retry(2)
